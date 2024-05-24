@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+entity "users" {
+*id : number <<generated>>
+--
+name: varchar (255)
+email: varchar (255)
+password : varchar (255)
+}
+
+entity "books" {
+*id : number <<generated>>
+*user_id : number <<FK>>
+--
+title : varchar (255)
+author : varchar (255)
+description : text
+}
+
+entity "ratings" {
+*id : number <<generated>>
+*user_id : number <<FK>>
+*book_id : number <<FK>>
+--
+rating : number
+}
+
+
+users }|..|| books
+books }|..|| ratings
+
+@enduml

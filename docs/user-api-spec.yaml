@@ -1,0 +1,160 @@
+  openapi: 3.0.3
+  info:
+    title: User APi Spec
+    description: specification on user module
+    version: 1.0.0
+  servers:
+    - url: 'https:localhost:8000/api/users'
+  paths:
+    /api/users/register:
+      post:
+        description: 'create new user'
+        requestBody:
+          content:
+            application/json:
+              examples:
+                create user:
+                  description: 'register new user'
+                  value: {
+                    name: 'ari',
+                    email: 'ari@tes.com',
+                    password: 'secret'
+                  }
+                  summary: test
+              schema:
+                type: object
+                required:
+                  - name
+                  - email
+                  - password
+                properties:
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  password:
+                    type: string
+        responses:
+          201:
+            description: 'success user registered'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      properties:
+                        data:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            name:
+                              type: string
+                            email:
+                              type: string
+                examples:
+                  success:
+                    description: 'example success registered'
+                    value: {
+                      data: {
+                        id: 1,
+                        name: ari,
+                        email: ari@mail.co,
+                      }
+                    }
+          400:
+            description: 'validation errors'
+            content:
+              application/json:
+                examples:
+                  errors:
+                    description: 'example validation errors'
+                    value: {
+                      errors: {
+                        name: [
+                          'name is required',
+                          'name max length 255'
+                        ],
+                        email: [
+                          'email not valid',
+                          'email has been registered'
+                        ],
+                        password: [
+                          'password min length 5 char'
+                        ]
+                      }
+                    }
+  
+    /api/users/login:
+      post:
+        description: 'Login User'
+        requestBody:
+          content:
+            login:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  password:
+                    type: string
+                required:
+                  - email
+                  - password
+              examples:
+                login user:
+                  description: 'example user login'
+                  value : {
+                            email: 'ari@mail.com',
+                            password: 'secret'
+                  }
+        responses:
+          200:
+            description: 'success login'
+            content:
+             application/json:
+               examples:
+                 success:
+                   value : {
+                             data:{
+                               id : 1,
+                               name : ari,
+                               email : ari@mail.co,
+                               token: 'random'
+                             }
+                   }
+               schema:
+                type: object
+                properties:
+                  name :
+                    type : string
+                  email :
+                    type : string
+                  token :
+                    type : string
+            
+          400:
+            description: 'validation errors'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+                examples:
+                  errors:
+                    description: 'example validation error'
+                    value : {
+                              errors:{
+                                      'email or password is wrong'
+                              }
+                    }
+    
+    /api/users/curent:
+      get:
+  
+      post:
