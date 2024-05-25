@@ -156,5 +156,92 @@
     
     /api/users/curent:
       get:
-  
-      post:
+        description: 'return current user from the system'
+        parameters:
+          - name: token
+            in: header
+            required : true
+            schema:
+              type: string
+        responses:
+          200:
+            description: 'user to be returned'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    email:
+                      type: string
+                examples:
+                  success:
+                    description: 'example returned data user'
+                    value : {
+                      id: 1,
+                      name: 'ari',
+                      email: 'ari@mail.com'
+                    }
+      patch:
+        description: 'update current user'
+        parameters:
+          - name: token
+            in: header
+            required : true
+            schema:
+              type: string
+        requestBody :
+          content :
+            update:
+              schema :
+                type : object
+                properties :
+                  name:
+                    type: string
+                  email :
+                    type : string
+                  password :
+                    type : string
+        responses :
+          200 :
+            description : 'user to be updated'
+            content :
+              application/json :
+                schema :
+                  type : object
+                  properties :
+                    id :
+                      type : integer
+                    name :
+                      type : string
+                    email :
+                      type : string
+                examples :
+                  success :
+                    description : 'example returned data user'
+                    value : {
+                      id : 1,
+                      name : 'ari new',
+                      email : 'ari@mail.com'
+                    }
+    /api/users/logout:
+      delete:
+        description: 'delete for token user from the system'
+        parameters:
+          - name: token
+            in: header
+            required : true
+            schema:
+              type: string
+        responses:
+          200:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                     data:
+                       type: boolean
