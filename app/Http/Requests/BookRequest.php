@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests;
 
+
+
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UserRegisterRequest extends FormRequest
+
+class BookRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,16 +27,20 @@ class UserRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fullName' => 'required|max:255',
-            'username' => 'required',
-            'password' => 'required',
+            'title' => 'required',
+            'author' => ['required','string'],
+            'publisher' => ['required','string'],
+            'stock' => ['required','numeric'],
+            'status' => 'required',
+
         ];
     }
 
     protected function failedValidation(Validator $validator)
     {
-       throw new HttpResponseException(response([
-           "errors" => $validator->getMessageBag()->toArray()
-       ],400));
+        throw new HttpResponseException(response([
+            "errors" => $validator->getMessageBag()->toArray()
+        ],400));
     }
+
 }

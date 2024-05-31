@@ -20,12 +20,12 @@ class UserController extends Controller
     public function register(UserRegisterRequest $request) : JsonResponse | UserResource
     {
         $data = $request->validated();
-        if(User::query()->where('email', $data['email'])->count() == 1){
+        if(User::query()->where('username', $data['username'])->count() == 1){
             throw new HttpResponseException(response([
                 'errors' => [
-                    'email' => 'The email has already been taken'
+                    'username' => 'The username has already been taken'
                 ]
-            ]));
+            ],400));
         }
         $user = new User($data);
         $user->password = Hash::make($data['password']);
@@ -40,11 +40,11 @@ class UserController extends Controller
     public function login(UserLoginRequest $request) : UserResource
     {
         $data = $request->validated();
-        $user = User::query()->where('email', $data['email'])->first();
+        $user = User::query()->where('username', $data['username'])->first();
         if(!$user || !Hash::check($data['password'], $user->password)){
             throw new HttpResponseException(response([
                 'errors' => [
-                    'message' => 'email or password is incorrect'
+                    'message' => 'username or password is incorrect'
                 ]
             ],400));
         }
@@ -64,8 +64,8 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $user = Auth::user();
-        if (isset($data['name'])){
-            $user->name = $data['name'];
+        if (isset($data['fullName'])){
+            $user->fullName = $data['fullName'];
         }
         if (isset($data['password'])){
             $user->password = Hash::make($data['password']);
@@ -75,4 +75,15 @@ class UserController extends Controller
             ->response()
             ->header('Authorization', $user->token);
     }
+
+    public function logout() : JsonResponse
+    {
+        $user = Auth::user();
+        $user->token = null;
+        $user->save();
+        return response()->json([
+           'logout' => true,
+        ]);
+    }
+
 }

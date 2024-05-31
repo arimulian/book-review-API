@@ -3,54 +3,61 @@
 use App\Models\User;
 use function Pest\Laravel\{post,get,patch,delete};
 
-
+/*
+  * User Registration Tests
+ */
 describe('User Registration Service Test', function() {
     it('User registration success', function() {
         post('api/users/register', [
-            'name'=> 'user2',
-            'email' => 'user2@test.com',
+            'username' => 'ar',
             'password' => 'secret',
+            'fullName'=> 'ari',
         ])->assertStatus(201)
                 ->assertJson([
                     'data'=> [
-                        'name' => 'user2',
-                        'email' => 'user2@test.com'
+                        'fullName' => 'ari',
+                        'username' => 'ar',
                     ]
                 ]);
 
     });
 
     it('User registration fail', function() {
-            post('api/users/register',[
-                'name' => '',
-                'email' => '',
-                'password' => ''
-            ])
-                ->assertStatus(400)
-                ->assertJson([
-                    'errors' => [
-                        'name' => ['The name field is required.'],
-                        'email' => ['The email field is required.'],
-                        'password' => ['The password field is required.']
-                    ]
-                ]);
-        });
+        post('api/users/register', [
+            'fullName' => '',
+            'username' => '',
+            'password' => ''
+        ])
+            ->assertStatus(400)
+            ->assertJson([
+                'errors' => [
+                    "fullName" => [
+                        "The full name field is required."
+                    ],
+                    "username" => [
+                        "The username field is required."
+                    ],
+                    "password" => [
+                        "The password field is required."
+                    ]]
+            ]);
+    });
 
-    it('User registration email exists in database', function() {
+    it('User registration username exists in database', function() {
             post('api/users/register', [
-                'name' => 'user2',
-                'email' => 'user2@test.com',
+                'fullName' => 'user2',
+                'username' => 'user2@test.com',
                 'password' => 'secret',
             ]);
 
             post('api/users/register', [
-                'name' => 'user2',
-                'email' => 'user2@test.com',
+                'fullName' => 'user2',
+                'username' => 'user2@test.com',
                 'password' => 'secret',
             ])->assertStatus(400)
                 ->assertJson([
                     'errors' => [
-                        'email' => ['The email has already been taken.']
+                        'username' => 'The username has already been taken'
                     ]
                 ]);
         });
@@ -58,20 +65,22 @@ describe('User Registration Service Test', function() {
 });
 
 
-
+/*
+ * User Login Tests
+ */
 describe('User Login Service Test', function() {
 
     it('User Login Successful', function() {
         $response = post('api/users/login', [
-            'email' => 'user@test.com',
+            'username' => 'username',
             'password' => 'secret',
         ]);
         $user = User::query()->first();
         $response->assertStatus(200)
                 ->assertJson([
                    'data' => [
-                       'name' => $user->name,
-                       'email' => $user->email,
+                       'fullName' => $user->fullName,
+                       'username' => $user->username,
                        'token' => $user->token,
                    ]
                 ]);
@@ -79,31 +88,34 @@ describe('User Login Service Test', function() {
 
     it('User login is incorrect password', function () {
         post('api/users/login',[
-            'email' => 'user@example.com',
+            'username' => 'username',
             'password' => 'wrong',
         ])
             ->assertStatus(400)
             ->assertJson([
                 'errors' => [
-                    'message' => 'email or password is incorrect',
+                    'message' => 'username or password is incorrect',
                 ]
             ]);
     });
 
-    it('user login email is not registered', function () {
+    it('user login username is not registered', function () {
         post('api/users/login',[
-            'email' => 'user@test.com',
-            'password' => 'wrong',
+            'username' => 'user',
+            'password' => 'secret',
         ])
             ->assertStatus(400)
             ->assertJson([
                 'errors' => [
-                   'message' => 'email or password is incorrect',
+                   'message' => 'username or password is incorrect',
                 ]
             ]);
     });
 });
 
+/*
+ * User Get data current user
+ */
 describe('User Current Data Tests', function() {
 
     it('Get User Current Data Successful', function() {
@@ -114,8 +126,8 @@ describe('User Current Data Tests', function() {
             ->assertJson([
                 'data' => [
                     'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
+                    'fullName' => $user->fullName,
+                    'username' => $user->username,
                     'token' => $user->token,
                 ]
             ]);
@@ -142,12 +154,15 @@ describe('User Current Data Tests', function() {
     });
 });
 
+/*
+ * User update Tests
+ */
 describe('User Update Data Tests', function() {
 
-    it('Update name user successfully', function() {
+    it('Update fullName user successfully', function() {
         $token = User::query()->first();
         $response = patch('api/users/current',[
-            'name' => 'user2',
+            'fullName' => 'user2',
         ],[
             'Authorization' => $token->token
         ]);
@@ -156,8 +171,8 @@ describe('User Update Data Tests', function() {
             ->assertJson([
                 'data' => [
                     'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
+                    'fullName' => $user->fullName,
+                    'username' => $user->username,
                 ]
             ]);
     });
@@ -174,14 +189,13 @@ describe('User Update Data Tests', function() {
             ->assertJson([
                 'data' => [
                     'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
+                    'fullName' => $user->fullName,
+                    'username' => $user->username,
                 ]
             ]);
     });
 
     it('Update user fail', function() {
-        $token = User::query()->first();
         $response = patch('api/users/current',[
             'name' => 'user2',
         ],[
@@ -193,4 +207,39 @@ describe('User Update Data Tests', function() {
             ]);
     });
 
+});
+
+
+/*
+ * User Logout Tests
+ */
+describe('User Logout test', function() {
+
+    it('User logout successfully', function() {
+        $user = User::query()->first();
+        delete('api/users/logout', headers: [
+            'Authorization' => $user->token
+        ])->assertStatus(200)
+            ->assertJson([
+                   'logout' => true
+            ]);
+    });
+
+    it('User logout do not use token', function() {
+        delete('api/users/logout',headers: [
+            'Authorization' => ''
+        ])->assertStatus(401)
+            ->assertJson([
+               'message' => 'Unauthorized'
+            ]);
+    });
+
+    it('User logout invalid token', function() {
+        delete('api/users/logout', headers: [
+            'Authorization' => 'invalidToken'
+        ])->assertStatus(401)
+            ->assertJson([
+               'message' => 'Unauthorized'
+            ]);
+    });
 });

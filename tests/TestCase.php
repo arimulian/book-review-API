@@ -13,9 +13,10 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 //        DB::delete('delete from reviews');
-//        DB::delete('delete from books');
+        DB::delete('delete from books');
         DB::delete('delete from users');
         $this->seed(UserSeeder::class);
     }
+
 
 }

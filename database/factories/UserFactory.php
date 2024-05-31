@@ -34,8 +34,8 @@ class UserFactory extends Factory
 //            'remember_token' => Str::random(10),
 ////        ];
         return [
-            'name'=> 'user',
-            'email' => 'user@test.com',
+            'fullName'=> 'user',
+            'userName' => 'username',
             'password' => Hash::make('secret'),
             'token' => 'test',
         ];

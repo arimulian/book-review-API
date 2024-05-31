@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,26 +16,37 @@ class UserResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
+            'fullName' => $this->fullName,
+            'username' => $this->username,
             'password' => $this->when($request->getPassword() ,$this->password),
             'token' => $this->whenNotNull($this->token),
         ];
     }
     public function with(Request $request)
     {
-        if ($request->input('password') && $request->input('name')) {
+        if($request->getMethod() == 'PATCH') {
+            if ($request->input('password') && $request->input('fullName')) {
+                return [
+                    'message' => 'password & Name is updated successfully',
+                ];
+            }else if ($request->input('password')) {
+                return [
+                    'message' => 'password is updated successfully',
+                ];
+            }else {
+                return [
+                    'message' => 'Name is updated successfully',
+                ];
+            }
+
+        }else if ($request->path() == 'api/users/login'){
             return [
-               'message' => 'password & name is Changed',
-            ];
-        }else if ($request->input('password')) {
-            return [
-               'message' => 'password is updated',
+                'message' => 'User is logged in successfully',
             ];
         }
 
         return [
-           'message' => 'Name is updated',
+            'message' => 'User is created successfully',
         ];
     }
 

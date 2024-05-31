@@ -4,19 +4,32 @@
 entity "users" {
 *id : number <<generated>>
 --
-name: varchar (255)
-email: varchar (255)
-password : varchar (255)
+username: varchar (255) <<unique>>
+password: varchar (255)
+fullName : varchar (255)
 }
 
 entity "books" {
 *id : number <<generated>>
-*user_id : number <<FK>>
+*code : varchar (20) <<unique>>
 --
 title : varchar (255)
 author : varchar (255)
-description : text
+publisher : varchar (255)
+status : enum
 }
+
+
+entity "transactions" {
+*id : number <<generated>>
+*user_id : number <<FK>>
+*book_id : number <<FK>>
+--
+borrowDate : date
+returnDate : date
+status : varchar (255)
+}
+
 
 entity "ratings" {
 *id : number <<generated>>
@@ -27,7 +40,11 @@ rating : number
 }
 
 
-users }|..|| books
-books }|..|| ratings
+transactions }|--|| users
+transactions }|--|| books
+ratings}|--||books
+
+
+
 
 @enduml
